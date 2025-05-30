@@ -35,7 +35,7 @@
             nixpkgs = import inputs.nixpkgs {
               system = "${system}";
               overlays = [
-                (import ./overlays/default.nix)
+                inputs.self.overlays.default
               ];
             };
             nix-bundle = import inputs.self { inherit nixpkgs; };
@@ -53,7 +53,7 @@
         nixpkgs = import inputs.nixpkgs {
           system = "${system}";
           overlays = [
-            (import ./overlays/default.nix)
+            inputs.self.overlays.default
           ];
         };
       in
@@ -65,6 +65,8 @@
         packages = {
           pkgs = nixpkgs;
         };
+
+        overlays.default = import ./overlays/default.nix;
       }
     );
 }
