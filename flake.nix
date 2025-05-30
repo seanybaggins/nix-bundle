@@ -32,7 +32,12 @@
             programPath ? getExe drv,
           }:
           let
-            nixpkgs = inputs.nixpkgs.legacyPackages.${system};
+            nixpkgs = import inputs.nixpkgs {
+              system = "${system}";
+              overlays = [
+                (import ./overlays/default.nix)
+              ];
+            };
             nix-bundle = import inputs.self { inherit nixpkgs; };
             script = nixpkgs.writeScript "startup" ''
               #!/bin/sh
@@ -44,11 +49,21 @@
             targets = [ script ];
             startup = ".${builtins.unsafeDiscardStringContext script} '\"$@\"'";
           };
+        # For debugging only
+        nixpkgs = import inputs.nixpkgs {
+          system = "${system}";
+          overlays = [
+            (import ./overlays/default.nix)
+          ];
+        };
       in
       {
         bundlers = {
           default = inputs.self.bundlers.${system}.nix-bundle;
           nix-bundle = drv: nix-bundle-fun { inherit drv; };
+        };
+        packages = {
+          pkgs = nixpkgs;
         };
       }
     );
