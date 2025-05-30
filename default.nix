@@ -1,8 +1,8 @@
 {
-  pkgsSystem,
+  nixpkgs,
 }:
 
-with pkgsSystem;
+with nixpkgs;
 
 rec {
   toARXArchX =
