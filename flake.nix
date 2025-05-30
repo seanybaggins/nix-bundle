@@ -7,7 +7,10 @@
   };
 
   outputs =
-    inputs:
+    {
+      ...
+    }@inputs:
+
     let
       inherit (inputs.nixpkgs) lib;
 
@@ -23,7 +26,10 @@
           )
         );
     in
-    inputs.utils.lib.eachDefaultSystem (
+    {
+      overlays.default = import ./overlays/default.nix;
+    }
+    // inputs.utils.lib.eachDefaultSystem (
       system:
       let
         nix-bundle-fun =
@@ -66,7 +72,6 @@
           pkgs = nixpkgs;
         };
 
-        overlays.default = import ./overlays/default.nix;
       }
     );
 }
