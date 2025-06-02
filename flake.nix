@@ -17,7 +17,6 @@
     // inputs.utils.lib.eachDefaultSystem (
       system:
       let
-        # For debugging only
         pkgs = import inputs.nixpkgs {
           system = "${system}";
           overlays = [
@@ -28,10 +27,16 @@
       in
       {
         bundlers = {
-          default = inputs.self.bundlers.${system}.nix-bundle;
-          nix-bundle =
+          default = inputs.self.bundlers.${system}.toArx;
+          toArx =
             drvToBundle:
-            nix-bundle-lib.toARXArchX {
+            nix-bundle-lib.toArxArchX {
+              inherit drvToBundle;
+              pkgsTarget = pkgs;
+            };
+          toArxArm64Cross =
+            drvToBundle:
+            nix-bundle-lib.toArxArchX {
               inherit drvToBundle;
               pkgsTarget = pkgs.pkgsCross.aarch64-multiplatform;
             };

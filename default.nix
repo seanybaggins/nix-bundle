@@ -5,7 +5,7 @@
 with nixpkgs;
 
 rec {
-  toARXArchX =
+  toArxArchX =
     {
       drvToBundle,
       pkgsTarget,
