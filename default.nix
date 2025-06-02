@@ -11,7 +11,7 @@ rec {
       pkgsTarget,
     }:
     let
-      programPath = lib.getExe drvToBundle (
+      programPath = lib.getExe' drvToBundle (
         drvToBundle.meta.mainProgram or (lib.warn
           "nix-bundle: Package ${
             lib.strings.escapeNixIdentifier drvToBundle.meta.name or drvToBundle.pname or drvToBundle.name
