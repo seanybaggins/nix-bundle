@@ -11,67 +11,32 @@
       ...
     }@inputs:
 
-    let
-      inherit (inputs.nixpkgs) lib;
-
-      getExe =
-        x:
-        lib.getExe' x (
-          x.meta.mainProgram or (lib.warn
-            "nix-bundle: Package ${
-              lib.strings.escapeNixIdentifier x.meta.name or x.pname or x.name
-            } does not have the meta.mainProgram attribute. Assuming you want '${lib.getName x}'."
-            lib.getName
-            x
-          )
-        );
-    in
     {
       overlays.default = import ./overlays/default.nix;
     }
     // inputs.utils.lib.eachDefaultSystem (
       system:
       let
-        nix-bundle-fun =
-          {
-            drv,
-            programPath ? getExe drv,
-          }:
-          let
-            nixpkgs = import inputs.nixpkgs {
-              system = "${system}";
-              overlays = [
-                inputs.self.overlays.default
-              ];
-            };
-            nix-bundle = import inputs.self { inherit nixpkgs; };
-            script = nixpkgs.writeScript "startup" ''
-              #!/bin/sh
-              .${nix-bundle.nix-user-chroot}/bin/nix-user-chroot -n ./nix -- ${programPath} "$@"
-            '';
-          in
-          nix-bundle.makebootstrap {
-            drvToBundle = drv;
-            targets = [ script ];
-            startup = ".${builtins.unsafeDiscardStringContext script} '\"$@\"'";
-          };
         # For debugging only
-        nixpkgs = import inputs.nixpkgs {
+        pkgs = import inputs.nixpkgs {
           system = "${system}";
           overlays = [
             inputs.self.overlays.default
           ];
         };
+        nix-bundle-lib = import inputs.self { nixpkgs = pkgs; };
       in
       {
         bundlers = {
           default = inputs.self.bundlers.${system}.nix-bundle;
-          nix-bundle = drv: nix-bundle-fun { inherit drv; };
+          nix-bundle =
+            drvToBundle:
+            nix-bundle-lib.toARXArchX {
+              inherit drvToBundle;
+              pkgsTarget = pkgs.pkgsCross.aarch64-multiplatform;
+            };
+          identity = drv: drv;
         };
-        packages = {
-          pkgs = nixpkgs;
-        };
-
       }
     );
 }
