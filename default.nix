@@ -58,7 +58,7 @@ rec {
     stdenv.mkDerivation {
       name =
         if drvToBundle != null then
-          "${drvToBundle.pname}-${drvToBundle.stdenv.system}-${drvToBundle.version}-arx"
+          "${drvToBundle.pname}-${drvToBundle.version}-${drvToBundle.stdenv.system}-arx"
         else
           "arx";
       passthru = {
