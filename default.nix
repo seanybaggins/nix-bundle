@@ -56,7 +56,11 @@ rec {
       startup,
     }:
     stdenv.mkDerivation {
-      name = if drvToBundle != null then "${drvToBundle.pname}-arx" else "arx";
+      name =
+        if drvToBundle != null then
+          "${drvToBundle.pname}-${drvToBundle.stdenv.system}-${drvToBundle.version}-arx"
+        else
+          "arx";
       passthru = {
         inherit drvToBundle;
       };
